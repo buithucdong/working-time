@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Working Time",
+  "version": "1.0.2",
+  "description": "Helps users stay focused by blocking distracting websites during work hours.",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Working Time"
+  },
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["privacy.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "author": "Bui Thuc Dong",
+  "homepage_url": "https://dong.works"
+}

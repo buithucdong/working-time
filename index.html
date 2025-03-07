@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Working Time</title>
+        <link rel="stylesheet" href="./styles.css" />
+    </head>
+
+    <body>
+        <div class="container">
+            <header>
+                <img class="logo" src="icon128.png" />
+                <h2>Danh sách</h2>
+            </header>
+            
+            <form class="block-form">
+                <div class="input-container">
+                    <input
+                        type="text"
+                        class="domain-input"
+                        placeholder="Nhập tên miền bạn muốn chặn"
+                    />
+                    <div class="time-inputs">
+                        <input type="time" id="startTime" name="startTime" required>
+                        <span>-</span>
+                        <input type="time" id="endTime" name="endTime" required>
+                    </div>
+                    <button class="block-button" type="submit">Block</button>
+                </div>
+            </form>
+            <ul class="domain-list"></ul>
+        </div>
+    </body>
+    <script src="./script.js"></script>
+</html>
