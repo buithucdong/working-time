@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Working Time",
-  "version": "1.0.2",
-  "description": "Helps users stay focused by blocking distracting websites during work hours.",
+  "version": "1.1.0",
+  "description": "Helps users stay focused by blocking distracting websites during work hours with advanced features.",
   "action": {
     "default_popup": "index.html",
     "default_title": "Working Time"
@@ -31,5 +31,5 @@
     }
   ],
   "author": "Bui Thuc Dong",
-  "homepage_url": "https://dong.works"
+  "homepage_url": "https://d-solutions.vn"
 }

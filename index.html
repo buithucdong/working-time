@@ -11,26 +11,88 @@
         <div class="container">
             <header>
                 <img class="logo" src="icon128.png" />
-                <h2>Danh sách</h2>
+                <h2>Working Time by D-Solutions</h2>
+                <div class="header-actions">
+                    <button id="exportBtn" class="action-btn">Xuất</button>
+                    <button id="importBtn" class="action-btn">Nhập</button>
+                </div>
             </header>
             
+            <!-- Điều khiển hàng loạt và tìm kiếm trên cùng một hàng -->
+            <div class="top-controls">
+                <button id="batchToggleBtn" class="batch-toggle-btn">Bật tất cả</button>
+                <div class="search-wrapper">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm trang web..." />
+                </div>
+            </div>
+            
+            <!-- Form thêm trang web -->
             <form class="block-form">
-                <div class="input-container">
+                <div class="domain-input-container">
                     <input
                         type="text"
                         class="domain-input"
                         placeholder="Nhập tên miền bạn muốn chặn"
                     />
-                    <div class="time-inputs">
-                        <input type="time" id="startTime" name="startTime" required>
-                        <span>-</span>
-                        <input type="time" id="endTime" name="endTime" required>
-                    </div>
-                    <button class="block-button" type="submit">Block</button>
                 </div>
+                
+                <div class="time-input-container">
+                    <input type="time" id="startTime" name="startTime" required>
+                    <span>-</span>
+                    <input type="time" id="endTime" name="endTime" required>
+                </div>
+                
+                <div class="weekday-selector">
+                    <span>Áp dụng vào: </span>
+                    <label><input type="checkbox" name="weekday" value="1" checked> T2</label>
+                    <label><input type="checkbox" name="weekday" value="2" checked> T3</label>
+                    <label><input type="checkbox" name="weekday" value="3" checked> T4</label>
+                    <label><input type="checkbox" name="weekday" value="4" checked> T5</label>
+                    <label><input type="checkbox" name="weekday" value="5" checked> T6</label>
+                    <label><input type="checkbox" name="weekday" value="6"> T7</label>
+                    <label><input type="checkbox" name="weekday" value="0"> CN</label>
+                </div>
+                
+                <button class="block-button" type="submit">Block</button>
             </form>
+            
+            <!-- Danh sách trang web -->
             <ul class="domain-list"></ul>
+            
+            <!-- Container cho tùy chọn tạm dừng -->
+            <div id="pauseDurationContainer" class="pause-duration-container hidden">
+                <span>Tạm dừng trong:</span>
+                <input type="number" id="pauseDuration" min="5" max="120" value="30">
+                <span>phút</span>
+                <button id="applyPauseBtn" class="apply-pause-btn">Áp dụng</button>
+                <button id="cancelPauseBtn" class="cancel-btn">Hủy</button>
+            </div>
+            
+            <!-- Thống kê -->
+            <div class="statistics-panel">
+                <button id="toggleStatsBtn" class="toggle-stats-btn">Hiển thị thống kê</button>
+                <div id="statisticsContent" class="statistics-content hidden">
+                    <div class="stats-item">
+                        <div class="stats-label">Số lần bị chặn:</div>
+                        <div id="blockCount" class="stats-value">0</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-label">Thời gian tiết kiệm:</div>
+                        <div id="savedTime" class="stats-value">0 phút</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-label">Trang web bị chặn nhiều nhất:</div>
+                        <div id="topBlockedDomain" class="stats-value">-</div>
+                    </div>
+                    <button id="resetStatsBtn" class="reset-stats-btn">Đặt lại thống kê</button>
+                </div>
+            </div>
+            
+            <!-- Phiên bản -->
+            <div class="version-info">
+                <span>Phiên bản 1.1.0</span> | <a href="https://d-solutions.vn">D-Solutions</a>
+            </div>
         </div>
+        <script src="./script.js"></script>
     </body>
-    <script src="./script.js"></script>
 </html>
