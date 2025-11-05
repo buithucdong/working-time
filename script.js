@@ -1,7 +1,7 @@
 /**
  * Working Time Extension - script.js
- * Version: 1.1.0
- * 
+ * Version: 1.1.1
+ *
  * Các chức năng chính:
  * - Quản lý danh sách trang web bị chặn
  * - Điều khiển hàng loạt (bật/tắt tất cả)
@@ -134,17 +134,15 @@ function loadBlockedDomains() {
         
         for (let domain in blockedDomains) {
             const domainData = blockedDomains[domain];
-            // Kiểm tra xem domain có đang trong thời gian chặn không
-            const isCurrentlyBlocked = isBlockedTime(domainData);
-            
+
             // Hiển thị ngày trong tuần
             const weekdayDisplay = getWeekdayDisplayText(domainData.weekdays || [1, 2, 3, 4, 5, 6, 0]);
-            
+
             let domainElement = document.createElement('div');
             domainElement.className = 'domain';
             domainElement.innerHTML = `
                 <label class="toggle">
-                    <input type="checkbox" ${isCurrentlyBlocked && domainData.enabled ? 'checked' : ''}>
+                    <input type="checkbox" ${domainData.enabled ? 'checked' : ''}>
                     <span class="slider"></span>
                 </label>
                 <li>${domain}</li>
@@ -253,32 +251,14 @@ function isBlockedTime(domainData) {
 }
 
 // Kiểm tra và cập nhật trạng thái chặn
+// Lưu ý: enabled flag giờ đại diện cho lựa chọn của người dùng, không tự động thay đổi
+// Việc kiểm tra thời gian được thực hiện trong content.js
 function updateBlockStatus() {
+    // Hàm này giữ lại để tương thích, nhưng không còn tự động thay đổi enabled flag
+    // Người dùng có toàn quyền kiểm soát việc bật/tắt các rule
     chrome.storage.local.get({ blockedDomains: {} }, function(result) {
-        const blockedDomains = result.blockedDomains;
-        let updated = false;
-
-        for (let domain in blockedDomains) {
-            const domainData = blockedDomains[domain];
-            const currentlyBlocked = isBlockedTime(domainData);
-
-            // Nếu đang trong thời gian chặn nhưng chưa bật, hãy bật
-            if (currentlyBlocked && !domainData.enabled) {
-                blockedDomains[domain].enabled = true;
-                updated = true;
-            }
-            // Nếu không còn trong thời gian chặn nhưng đang bật, hãy tắt
-            else if (!currentlyBlocked && domainData.enabled) {
-                blockedDomains[domain].enabled = false;
-                updated = true;
-            }
-        }
-
-        if (updated) {
-            chrome.storage.local.set({ blockedDomains: blockedDomains }, function() {
-                loadBlockedDomains(); // Reload danh sách để cập nhật UI
-            });
-        }
+        // Chỉ reload UI để cập nhật hiển thị nếu cần
+        loadBlockedDomains();
     });
 }
 

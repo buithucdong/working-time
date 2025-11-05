@@ -4,13 +4,14 @@ function fireContentLoadedEvent() {
 	// Replace the page content with a message
 	chrome.storage.local.get({ blockedDomains: {} }, function (result) {
 	  let blockedDomains = result.blockedDomains;
-  
+
 	  const hostname = window.location.hostname;
 	  const hostnameWithoutSubdomain = hostname.replace(/^www\./, ""); // remove 'www' subdomain, if present
-	  const blocked =
-		blockedDomains[hostname]?.enabled ||
-		blockedDomains[hostnameWithoutSubdomain]?.enabled;
-	  
+
+	  // Kiểm tra xem domain có bị chặn và có đúng thời gian + ngày không
+	  const domainData = blockedDomains[hostname] || blockedDomains[hostnameWithoutSubdomain];
+	  const blocked = domainData?.enabled && isBlockedTime(domainData);
+
 	  if (blocked) {
 		// Cập nhật thống kê khi trang bị chặn
 		updateBlockStatistics(hostname);
@@ -107,23 +108,56 @@ function fireContentLoadedEvent() {
 	});
   }
   
+  // Hàm kiểm tra thời gian chặn
+  function timeToMinutes(timeStr) {
+	const [hours, minutes] = timeStr.split(':').map(Number);
+	return hours * 60 + minutes;
+  }
+
+  function isBlockedTime(domainData) {
+	if (!domainData || !domainData.startTime || !domainData.endTime) {
+	  return false;
+	}
+
+	const now = new Date();
+	const currentDay = now.getDay(); // 0 = Chủ Nhật, 1-6 = Thứ 2 đến Thứ 7
+
+	// Kiểm tra ngày trong tuần
+	if (domainData.weekdays && !domainData.weekdays.includes(currentDay)) {
+	  return false; // Không áp dụng vào ngày này
+	}
+
+	const currentTime = now.getHours().toString().padStart(2, '0') + ':' +
+					 now.getMinutes().toString().padStart(2, '0');
+
+	const currentMinutes = timeToMinutes(currentTime);
+	const startMinutes = timeToMinutes(domainData.startTime);
+	const endMinutes = timeToMinutes(domainData.endTime);
+
+	if (startMinutes <= endMinutes) {
+	  return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+	} else {
+	  return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
+	}
+  }
+
   // Hàm cập nhật thống kê
   function updateBlockStatistics(domain) {
 	chrome.storage.local.get({ statistics: { blockCount: 0, savedTime: 0, blockHistory: {} } }, function(result) {
 	  const stats = result.statistics;
-	  
+
 	  // Tăng tổng số lần bị chặn
 	  stats.blockCount++;
-	  
+
 	  // Tăng số lần bị chặn cho domain cụ thể
 	  if (!stats.blockHistory[domain]) {
 		stats.blockHistory[domain] = 0;
 	  }
 	  stats.blockHistory[domain]++;
-	  
+
 	  // Tăng thời gian tiết kiệm (giả định mỗi lần chặn tiết kiệm 5 phút)
 	  stats.savedTime += 5;
-	  
+
 	  // Lưu lại thống kê
 	  chrome.storage.local.set({ statistics: stats });
 	});
