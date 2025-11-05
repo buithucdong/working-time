@@ -1,7 +1,7 @@
 /**
  * Working Time Extension - script.js
- * Version: 1.1.0
- * 
+ * Version: 1.1.2
+ *
  * Các chức năng chính:
  * - Quản lý danh sách trang web bị chặn
  * - Điều khiển hàng loạt (bật/tắt tất cả)
@@ -54,10 +54,8 @@ blockForm.addEventListener('submit', (e) => {
         return;
     }
 
-    if (startTime >= endTime) {
-        alert('Thời gian kết thúc phải sau thời gian bắt đầu');
-        return;
-    }
+    // Cho phép cả rule overnight (ví dụ: 22:00 - 06:00)
+    // Logic xử lý overnight đã được implement trong isBlockedTime()
 
     addBlockedDomain(domain);
 
@@ -134,17 +132,15 @@ function loadBlockedDomains() {
         
         for (let domain in blockedDomains) {
             const domainData = blockedDomains[domain];
-            // Kiểm tra xem domain có đang trong thời gian chặn không
-            const isCurrentlyBlocked = isBlockedTime(domainData);
-            
+
             // Hiển thị ngày trong tuần
             const weekdayDisplay = getWeekdayDisplayText(domainData.weekdays || [1, 2, 3, 4, 5, 6, 0]);
-            
+
             let domainElement = document.createElement('div');
             domainElement.className = 'domain';
             domainElement.innerHTML = `
                 <label class="toggle">
-                    <input type="checkbox" ${isCurrentlyBlocked && domainData.enabled ? 'checked' : ''}>
+                    <input type="checkbox" ${domainData.enabled ? 'checked' : ''}>
                     <span class="slider"></span>
                 </label>
                 <li>${domain}</li>
@@ -226,59 +222,45 @@ function timeToMinutes(timeStr) {
 }
 
 function isBlockedTime(domainData) {
-    if (!domainData) {
+    if (!domainData || !domainData.startTime || !domainData.endTime) {
         return false;
     }
 
     const now = new Date();
     const currentDay = now.getDay(); // 0 = Chủ Nhật, 1-6 = Thứ 2 đến Thứ 7
-    
+
     // Kiểm tra ngày trong tuần
-    if (domainData.weekdays && !domainData.weekdays.includes(currentDay)) {
+    // Nếu weekdays không tồn tại hoặc là mảng rỗng, mặc định áp dụng cho tất cả các ngày
+    if (domainData.weekdays && domainData.weekdays.length > 0 && !domainData.weekdays.includes(currentDay)) {
         return false; // Không áp dụng vào ngày này
     }
-    
-    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
+
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' +
                      now.getMinutes().toString().padStart(2, '0');
-    
+
     const currentMinutes = timeToMinutes(currentTime);
     const startMinutes = timeToMinutes(domainData.startTime);
     const endMinutes = timeToMinutes(domainData.endTime);
 
+    // Xử lý cả rule trong ngày (08:00-17:00) và rule overnight (22:00-06:00)
     if (startMinutes <= endMinutes) {
+        // Rule trong cùng ngày
         return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
     } else {
+        // Rule qua đêm (ví dụ: 22:00 - 06:00)
         return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     }
 }
 
 // Kiểm tra và cập nhật trạng thái chặn
+// Lưu ý: enabled flag giờ đại diện cho lựa chọn của người dùng, không tự động thay đổi
+// Việc kiểm tra thời gian được thực hiện trong content.js
 function updateBlockStatus() {
+    // Hàm này giữ lại để tương thích, nhưng không còn tự động thay đổi enabled flag
+    // Người dùng có toàn quyền kiểm soát việc bật/tắt các rule
     chrome.storage.local.get({ blockedDomains: {} }, function(result) {
-        const blockedDomains = result.blockedDomains;
-        let updated = false;
-
-        for (let domain in blockedDomains) {
-            const domainData = blockedDomains[domain];
-            const currentlyBlocked = isBlockedTime(domainData);
-
-            // Nếu đang trong thời gian chặn nhưng chưa bật, hãy bật
-            if (currentlyBlocked && !domainData.enabled) {
-                blockedDomains[domain].enabled = true;
-                updated = true;
-            }
-            // Nếu không còn trong thời gian chặn nhưng đang bật, hãy tắt
-            else if (!currentlyBlocked && domainData.enabled) {
-                blockedDomains[domain].enabled = false;
-                updated = true;
-            }
-        }
-
-        if (updated) {
-            chrome.storage.local.set({ blockedDomains: blockedDomains }, function() {
-                loadBlockedDomains(); // Reload danh sách để cập nhật UI
-            });
-        }
+        // Chỉ reload UI để cập nhật hiển thị nếu cần
+        loadBlockedDomains();
     });
 }
 
@@ -695,6 +677,9 @@ function importSettings(event) {
 
 // Hàm tạo văn bản hiển thị ngày trong tuần
 function getWeekdayDisplayText(weekdays) {
+    if (!weekdays || weekdays.length === 0) {
+        return "Tất cả các ngày";
+    }
     const dayNames = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
     return weekdays.map(day => dayNames[day]).join(', ');
 }
