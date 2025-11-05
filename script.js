@@ -54,10 +54,8 @@ blockForm.addEventListener('submit', (e) => {
         return;
     }
 
-    if (startTime >= endTime) {
-        alert('Thời gian kết thúc phải sau thời gian bắt đầu');
-        return;
-    }
+    // Cho phép cả rule overnight (ví dụ: 22:00 - 06:00)
+    // Logic xử lý overnight đã được implement trong isBlockedTime()
 
     addBlockedDomain(domain);
 
@@ -224,28 +222,32 @@ function timeToMinutes(timeStr) {
 }
 
 function isBlockedTime(domainData) {
-    if (!domainData) {
+    if (!domainData || !domainData.startTime || !domainData.endTime) {
         return false;
     }
 
     const now = new Date();
     const currentDay = now.getDay(); // 0 = Chủ Nhật, 1-6 = Thứ 2 đến Thứ 7
-    
+
     // Kiểm tra ngày trong tuần
-    if (domainData.weekdays && !domainData.weekdays.includes(currentDay)) {
+    // Nếu weekdays không tồn tại hoặc là mảng rỗng, mặc định áp dụng cho tất cả các ngày
+    if (domainData.weekdays && domainData.weekdays.length > 0 && !domainData.weekdays.includes(currentDay)) {
         return false; // Không áp dụng vào ngày này
     }
-    
-    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
+
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' +
                      now.getMinutes().toString().padStart(2, '0');
-    
+
     const currentMinutes = timeToMinutes(currentTime);
     const startMinutes = timeToMinutes(domainData.startTime);
     const endMinutes = timeToMinutes(domainData.endTime);
 
+    // Xử lý cả rule trong ngày (08:00-17:00) và rule overnight (22:00-06:00)
     if (startMinutes <= endMinutes) {
+        // Rule trong cùng ngày
         return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
     } else {
+        // Rule qua đêm (ví dụ: 22:00 - 06:00)
         return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     }
 }
@@ -675,6 +677,9 @@ function importSettings(event) {
 
 // Hàm tạo văn bản hiển thị ngày trong tuần
 function getWeekdayDisplayText(weekdays) {
+    if (!weekdays || weekdays.length === 0) {
+        return "Tất cả các ngày";
+    }
     const dayNames = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
     return weekdays.map(day => dayNames[day]).join(', ');
 }

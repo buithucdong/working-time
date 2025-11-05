@@ -1,4 +1,10 @@
-document.addEventListener("DOMContentLoaded", fireContentLoadedEvent, false);
+// Chạy khi DOM loaded hoặc ngay lập tức nếu DOM đã sẵn sàng
+if (document.readyState === 'loading') {
+	document.addEventListener("DOMContentLoaded", fireContentLoadedEvent, false);
+} else {
+	// DOM đã sẵn sàng, chạy ngay
+	fireContentLoadedEvent();
+}
 
 function fireContentLoadedEvent() {
 	// Replace the page content with a message
@@ -123,7 +129,8 @@ function fireContentLoadedEvent() {
 	const currentDay = now.getDay(); // 0 = Chủ Nhật, 1-6 = Thứ 2 đến Thứ 7
 
 	// Kiểm tra ngày trong tuần
-	if (domainData.weekdays && !domainData.weekdays.includes(currentDay)) {
+	// Nếu weekdays không tồn tại hoặc là mảng rỗng, mặc định áp dụng cho tất cả các ngày
+	if (domainData.weekdays && domainData.weekdays.length > 0 && !domainData.weekdays.includes(currentDay)) {
 	  return false; // Không áp dụng vào ngày này
 	}
 
@@ -134,9 +141,12 @@ function fireContentLoadedEvent() {
 	const startMinutes = timeToMinutes(domainData.startTime);
 	const endMinutes = timeToMinutes(domainData.endTime);
 
+	// Xử lý cả rule trong ngày (08:00-17:00) và rule overnight (22:00-06:00)
 	if (startMinutes <= endMinutes) {
+	  // Rule trong cùng ngày
 	  return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
 	} else {
+	  // Rule qua đêm (ví dụ: 22:00 - 06:00)
 	  return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
 	}
   }
