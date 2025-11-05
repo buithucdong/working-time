@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Working Time",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Helps users stay focused by blocking distracting websites during work hours with advanced features.",
   "action": {
     "default_popup": "index.html",
