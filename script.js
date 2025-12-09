@@ -1,6 +1,6 @@
 /**
  * Working Time Extension - script.js
- * Version: 1.1.2
+ * Version: 1.2.0
  *
  * Các chức năng chính:
  * - Quản lý danh sách trang web bị chặn
