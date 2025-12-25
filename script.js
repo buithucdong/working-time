@@ -329,10 +329,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
     
+    // Thêm sự kiện cho nút toggle search
+    const searchToggleBtn = document.getElementById('searchToggleBtn');
+    const searchContainer = document.getElementById('searchContainer');
+    const searchInput = document.getElementById('searchInput');
+    const searchCloseBtn = document.getElementById('searchCloseBtn');
+
+    searchToggleBtn.addEventListener('click', function() {
+        searchContainer.classList.remove('hidden');
+        searchInput.focus();
+    });
+
+    searchCloseBtn.addEventListener('click', function() {
+        searchContainer.classList.add('hidden');
+        searchInput.value = '';
+        searchDomains(''); // Clear search
+    });
+
     // Thêm sự kiện cho thanh tìm kiếm
-    document.getElementById('searchInput').addEventListener('input', function() {
+    searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         searchDomains(searchTerm);
+    });
+
+    // Thêm sự kiện cho import/export toggle
+    const importExportToggle = document.getElementById('importExportToggle');
+    const importExportActions = document.getElementById('importExportActions');
+
+    importExportToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        importExportActions.classList.toggle('hidden');
+
+        if (!importExportActions.classList.contains('hidden')) {
+            importExportActions.classList.add('show');
+        } else {
+            importExportActions.classList.remove('show');
+        }
     });
     
     // Thêm sự kiện cho nút hiển thị thống kê
@@ -510,16 +542,18 @@ function updateBatchToggleButtonStatus() {
         const blockedDomains = result.blockedDomains;
         const activeCount = getActiveDomainsCount(blockedDomains);
         const totalCount = Object.keys(blockedDomains).length;
-        
+
         const batchToggleBtn = document.getElementById('batchToggleBtn');
+        const btnText = batchToggleBtn.querySelector('span');
+
         if (activeCount === 0) {
-            batchToggleBtn.textContent = 'Bật tất cả';
+            btnText.textContent = 'Bật';
             batchToggleBtn.classList.remove('all-active');
         } else if (activeCount === totalCount) {
-            batchToggleBtn.textContent = 'Tắt tất cả';
+            btnText.textContent = 'Tạm dừng';
             batchToggleBtn.classList.add('all-active');
         } else {
-            batchToggleBtn.textContent = `Bật tất cả (${activeCount}/${totalCount})`;
+            btnText.textContent = `Bật (${activeCount}/${totalCount})`;
             batchToggleBtn.classList.remove('all-active');
         }
     });
@@ -541,12 +575,13 @@ function updatePauseStatus() {
     if (!pauseEndTime) {
         return;
     }
-    
+
     const now = new Date().getTime();
     if (pauseEndTime > now) {
         const remainingMinutes = Math.ceil((pauseEndTime - now) / 60000);
         const batchToggleBtn = document.getElementById('batchToggleBtn');
-        batchToggleBtn.textContent = `Tạm dừng (còn ${remainingMinutes} phút)`;
+        const btnText = batchToggleBtn.querySelector('span');
+        btnText.textContent = `Tạm dừng (${remainingMinutes}p)`;
         batchToggleBtn.classList.add('paused');
     } else {
         const batchToggleBtn = document.getElementById('batchToggleBtn');
