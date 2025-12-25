@@ -15,24 +15,34 @@
                     <h1 class="main-title">Working Time</h1>
                     <p class="subtitle">by D-Solutions</p>
                 </div>
-            </header>
-            
-            <!-- Điều khiển hàng loạt và tìm kiếm -->
-            <div class="control-card">
+                <button id="searchToggleBtn" class="search-toggle-btn" aria-label="Tìm kiếm">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
                 <button id="batchToggleBtn" class="batch-toggle-btn">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 11 12 14 22 4"></polyline>
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                     </svg>
-                    <span>Bật tất cả</span>
+                    <span>Bật</span>
                 </button>
-                <div class="search-wrapper">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="m21 21-4.35-4.35"></path>
+            </header>
+
+            <!-- Search Input (Hidden by default) -->
+            <div id="searchContainer" class="search-container hidden">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm trang web..." aria-label="Tìm kiếm trang web" />
+                <button id="searchCloseBtn" class="search-close-btn" aria-label="Đóng tìm kiếm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm trang web..." aria-label="Tìm kiếm trang web" />
-                </div>
+                </button>
             </div>
 
             <!-- Container cho tùy chọn tạm dừng -->
@@ -195,24 +205,38 @@
                 </div>
             </div>
             
-            <!-- Import/Export Actions -->
-            <div class="import-export-card">
-                <button id="exportBtn" class="action-btn export-btn" aria-label="Xuất dữ liệu">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Xuất dữ liệu
-                </button>
-                <button id="importBtn" class="action-btn import-btn" aria-label="Nhập dữ liệu">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- Import/Export Toggle -->
+            <div class="import-export-section">
+                <button id="importExportToggle" class="import-export-toggle">
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    Nhập dữ liệu
+                    <span>Xuất / Nhập dữ liệu</span>
+                    <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                 </button>
+
+                <div id="importExportActions" class="import-export-actions hidden">
+                    <button id="exportBtn" class="action-button export-button">
+                        <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Xuất dữ liệu</span>
+                    </button>
+                    <button id="importBtn" class="action-button import-button">
+                        <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span>Nhập dữ liệu</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Phiên bản -->
