@@ -2,6 +2,33 @@
 
 Tất cả các thay đổi quan trọng của dự án sẽ được ghi lại trong file này.
 
+## [1.3.0] - 2026-07-13
+
+### ⚙️ Engine chặn mới (declarativeNetRequest + Service Worker)
+
+#### Added
+- **Trang chặn nội bộ `blocked.html`**: trang gốc không bao giờ kịp hiển thị (hết flash nội dung), không tải bất kỳ tài nguyên ngoài nào
+- **Background service worker**: tự động tính toán và áp dụng luật chặn mỗi phút — hoạt động kể cả khi popup đóng
+- **Chặn tab đang mở sẵn**: tab mở trước giờ chặn sẽ bị chuyển hướng trong vòng ≤1 phút khi khung giờ bắt đầu, không cần reload
+- **Link "Quay lại trang này khi hết giờ chặn"** trên trang chặn — giữ lại URL gốc
+- **Nút ủng hộ (Buy me a coffee)** ở cuối popup
+- **Fonts đóng gói cục bộ** (Poppins + Open Sans woff2): không còn tải từ Google Fonts CDN
+
+#### Fixed
+- **Lỗi hẹn giờ tạm dừng chết khi đóng popup**: tạm dừng giờ do background quản lý qua `pauseEndTime` — đóng popup, tắt trình duyệt vẫn tự khôi phục chặn đúng giờ
+- **Tạm dừng không còn ghi đè cờ bật/tắt từng domain**: hết giờ tạm dừng, trạng thái bật/tắt của từng trang giữ nguyên như người dùng đã đặt
+- **Lỗi gắn trùng event handler** cho nút xóa/toggle trong danh sách domain (trước đây mỗi click chạy 2 lần)
+
+#### Changed
+- **UI popup thiết kế lại theo phong cách flat minimal (text-first)**: bỏ card/shadow/viền dày của Claymorphism, phân tách section bằng kẻ mảnh 1px, siết padding — danh sách domain dày hơn, thấy nhiều trang hơn không cần cuộn; #ffd300 giữ vai trò màu nhấn duy nhất; chiều rộng popup 650px → 560px
+- **Xóa content script**: không còn inject `content.js` vào mọi trang web — chặn bằng declarativeNetRequest redirect ở tầng network
+- **`script.js` (737 dòng) tách thành các ES module** trong `popup/` (mỗi file <200 dòng): domain-list-view, domain-add-form, batch-pause-controls, statistics-view, settings-import-export, popup-main
+- **Logic khung giờ dùng chung** chuyển vào `shared/time-window-rules.js` (background + popup dùng chung, hết trùng lặp code)
+- **Permissions**: thêm `alarms`, `declarativeNetRequestWithHostAccess`; CSP không còn host ngoài
+- **Dữ liệu người dùng giữ nguyên 100%**: schema `blockedDomains`/`statistics`/`pauseEndTime` không đổi — nâng cấp từ v1.2 và file backup cũ hoạt động bình thường
+
+---
+
 ## [1.2.0] - 2025-12-09
 
 ### 🎨 UI/UX - Thiết kế lại hoàn toàn (Educational Platform Theme)

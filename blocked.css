@@ -1,0 +1,48 @@
+/* Working Time - trang chặn nội bộ. Không tải tài nguyên ngoài. */
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffd300;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 24px;
+    text-align: center;
+}
+
+h1.message {
+    font-size: 52px;
+    font-weight: 700;
+    color: #162c6e; /* D-Solutions Navy-Dark trên nền vàng brand */
+    animation: 1s ease-in-out 0s 1 fadeIntoView;
+}
+
+.return-link {
+    margin-top: 24px;
+    font-size: 16px;
+    color: #162c6e;
+    text-decoration: underline;
+    animation: 1s ease-in-out 0s 1 fadeIntoView;
+}
+
+.return-link.hidden {
+    display: none;
+}
+
+@keyframes fadeIntoView {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
