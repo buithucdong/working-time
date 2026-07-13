@@ -223,6 +223,33 @@ body {
     color: var(--text);
 }
 
+/* Nút Focus — idle viền thường; đang focus → nền vàng + đếm ngược */
+.focus-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: transparent;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text);
+    flex-shrink: 0;
+}
+
+.focus-toggle-btn:hover {
+    border-color: var(--text);
+}
+
+.focus-toggle-btn.focusing {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
 /* ----- SEARCH ----- */
 .search-container {
     display: flex;
@@ -660,6 +687,64 @@ input:checked + .slider:before {
     font-size: 11px;
     color: var(--text-muted);
     letter-spacing: 0.02em;
+}
+
+/* Domain bị khóa bởi strict mode (đang trong giờ chặn/focus) */
+.domain.locked {
+    opacity: 0.55;
+}
+
+.domain.locked .slider,
+.domain.locked .delete-btn,
+.domain.locked input[type="time"] {
+    cursor: not-allowed;
+}
+
+/* ----- STRICT MODE ROW ----- */
+.strict-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.strict-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.strict-label input[type="checkbox"] {
+    cursor: pointer;
+    width: 13px;
+    height: 13px;
+    accent-color: var(--text);
+}
+
+.strict-hint {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+.strict-countdown {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+
+.strict-countdown.hidden {
+    display: none;
 }
 
 /* ----- STATISTICS ----- */

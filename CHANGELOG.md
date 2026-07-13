@@ -2,6 +2,21 @@
 
 Tất cả các thay đổi quan trọng của dự án sẽ được ghi lại trong file này.
 
+## [1.4.0] - 2026-07-13
+
+### 🎯 Focus Session + Chế độ nghiêm ngặt
+
+#### Added
+- **Phiên Focus**: nút Focus trên header — chặn TOÀN BỘ domain trong danh sách trong X phút (5-180, mặc định 25), kể cả domain đang tắt hoặc ngoài khung giờ. Badge trên icon extension đếm ngược số phút còn lại. Focus ưu tiên hơn tạm dừng: bấm focus tự hủy pause đang chạy
+- **Chế độ nghiêm ngặt** (opt-in): khi bật, domain đang trong giờ chặn (hoặc đang focus) không thể tắt/xóa/sửa giờ; không thể tạm dừng, hủy focus hay nhập dữ liệu. Muốn tắt chế độ này phải giữ popup mở đếm ngược 30 giây — đóng popup giữa chừng là hủy yêu cầu
+- **Export/import** thêm trạng thái chế độ nghiêm ngặt (file backup v1.2/v1.3 cũ vẫn nhập bình thường)
+
+#### Technical
+- Storage bổ sung `focusEndTime` + `strictMode` — schema cũ giữ nguyên, nâng cấp không mất dữ liệu
+- Badge cập nhật theo vòng lặp alarm 1 phút sẵn có, không giữ service worker sống liên tục
+
+---
+
 ## [1.3.0] - 2026-07-13
 
 ### ⚙️ Engine chặn mới (declarativeNetRequest + Service Worker)

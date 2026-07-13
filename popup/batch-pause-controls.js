@@ -17,7 +17,13 @@ export function initBatchPauseControls() {
     const cancelPauseBtn = document.getElementById('cancelPauseBtn');
 
     batchToggleBtn.addEventListener('click', function () {
-        chrome.storage.local.get({ blockedDomains: {}, pauseEndTime: null }, function (result) {
+        chrome.storage.local.get({ blockedDomains: {}, pauseEndTime: null, strictMode: false, focusEndTime: null }, function (result) {
+            // Đang focus → không pause/điều khiển hàng loạt (focus = cam kết)
+            if (result.focusEndTime && result.focusEndTime > Date.now()) {
+                alert('Đang trong phiên focus — điều khiển hàng loạt tạm khóa.');
+                return;
+            }
+
             // Đang pause → bấm nút = hủy pause, chặn hoạt động lại ngay
             if (result.pauseEndTime && result.pauseEndTime > Date.now()) {
                 chrome.storage.local.remove('pauseEndTime', updateBatchToggleButtonStatus);
@@ -28,8 +34,10 @@ export function initBatchPauseControls() {
             const totalCount = Object.keys(result.blockedDomains).length;
 
             if (activeCount < totalCount) {
-                // Có domain đang tắt → bật tất cả
+                // Có domain đang tắt → bật tất cả (tăng chặn — cho phép cả khi strict)
                 toggleAllDomains(true);
+            } else if (result.strictMode) {
+                alert('Chế độ nghiêm ngặt đang bật — không thể tạm dừng chặn.');
             } else {
                 // Tất cả đang bật → hiện tùy chọn tạm dừng
                 pauseDurationContainer.classList.remove('hidden');
@@ -44,11 +52,26 @@ export function initBatchPauseControls() {
             return;
         }
 
-        // Chỉ ghi pauseEndTime — background lo phần còn lại
-        const pauseEndTime = Date.now() + duration * 60 * 1000;
-        chrome.storage.local.set({ pauseEndTime: pauseEndTime }, function () {
-            updateBatchToggleButtonStatus();
-            pauseDurationContainer.classList.add('hidden');
+        // Kiểm tra lại focus/strict tại thời điểm bấm — container có thể được mở
+        // TRƯỚC khi focus/strict bật (guard ở nút hàng loạt không đủ)
+        chrome.storage.local.get({ focusEndTime: null, strictMode: false }, function (result) {
+            if (result.focusEndTime && result.focusEndTime > Date.now()) {
+                alert('Đang trong phiên focus — không thể tạm dừng.');
+                pauseDurationContainer.classList.add('hidden');
+                return;
+            }
+            if (result.strictMode) {
+                alert('Chế độ nghiêm ngặt đang bật — không thể tạm dừng chặn.');
+                pauseDurationContainer.classList.add('hidden');
+                return;
+            }
+
+            // Chỉ ghi pauseEndTime — background lo phần còn lại
+            const pauseEndTime = Date.now() + duration * 60 * 1000;
+            chrome.storage.local.set({ pauseEndTime: pauseEndTime }, function () {
+                updateBatchToggleButtonStatus();
+                pauseDurationContainer.classList.add('hidden');
+            });
         });
     });
 

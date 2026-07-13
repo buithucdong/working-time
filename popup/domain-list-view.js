@@ -5,33 +5,41 @@
  */
 
 import { updateBatchToggleButtonStatus } from './batch-pause-controls.js';
+import { isDomainLocked } from './strict-mode-control.js';
 
 const domainList = document.querySelector('.domain-list');
 
 export function renderDomainList() {
-    chrome.storage.local.get({ blockedDomains: {} }, function (result) {
+    chrome.storage.local.get({ blockedDomains: {}, strictMode: false, focusEndTime: null }, function (result) {
         const blockedDomains = result.blockedDomains;
+        const ctx = {
+            strictMode: result.strictMode,
+            focusActive: !!(result.focusEndTime && result.focusEndTime > Date.now())
+        };
         domainList.innerHTML = '';
 
         for (const domain in blockedDomains) {
             const domainData = blockedDomains[domain];
             const weekdayDisplay = getWeekdayDisplayText(domainData.weekdays || [1, 2, 3, 4, 5, 6, 0]);
+            // Strict mode: domain đang bị chặn → disable toggle/xóa/sửa giờ (không cho lách)
+            const locked = isDomainLocked(domainData, ctx);
+            const dis = locked ? 'disabled' : '';
 
             const domainElement = document.createElement('div');
-            domainElement.className = 'domain';
+            domainElement.className = locked ? 'domain locked' : 'domain';
             domainElement.innerHTML = `
-                <label class="toggle">
-                    <input type="checkbox" ${domainData.enabled ? 'checked' : ''}>
+                <label class="toggle" ${locked ? 'title="Chế độ nghiêm ngặt: đang trong giờ chặn"' : ''}>
+                    <input type="checkbox" ${domainData.enabled ? 'checked' : ''} ${dis}>
                     <span class="slider"></span>
                 </label>
                 <li>${domain}</li>
                 <div class="time-display" data-domain="${domain}">
-                    <input type="time" class="edit-start-time" value="${domainData.startTime}">
+                    <input type="time" class="edit-start-time" value="${domainData.startTime}" ${dis}>
                     -
-                    <input type="time" class="edit-end-time" value="${domainData.endTime}">
+                    <input type="time" class="edit-end-time" value="${domainData.endTime}" ${dis}>
                     <span class="weekday-display" title="${weekdayDisplay}">${getShortWeekdayDisplay(domainData.weekdays)}</span>
                 </div>
-                <button class="delete-btn">×</button>`;
+                <button class="delete-btn" ${dis}>×</button>`;
 
             domainList.appendChild(domainElement);
         }

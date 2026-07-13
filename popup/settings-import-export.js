@@ -21,18 +21,26 @@ export function initImportExport() {
     document.getElementById('exportBtn').addEventListener('click', exportSettings);
 
     document.getElementById('importBtn').addEventListener('click', function () {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.json';
-        fileInput.classList.add('import-file-input');
-        document.body.appendChild(fileInput);
+        // Import ghi đè toàn bộ danh sách — bị khóa khi strict để không lách được
+        chrome.storage.local.get({ strictMode: false }, function (result) {
+            if (result.strictMode) {
+                alert('Chế độ nghiêm ngặt đang bật — tắt strict trước khi nhập dữ liệu.');
+                return;
+            }
 
-        fileInput.addEventListener('change', importSettings);
-        fileInput.click();
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.json';
+            fileInput.classList.add('import-file-input');
+            document.body.appendChild(fileInput);
 
-        setTimeout(() => {
-            document.body.removeChild(fileInput);
-        }, 5000);
+            fileInput.addEventListener('change', importSettings);
+            fileInput.click();
+
+            setTimeout(() => {
+                document.body.removeChild(fileInput);
+            }, 5000);
+        });
     });
 }
 
@@ -41,6 +49,7 @@ function exportSettings() {
         const exportData = {
             blockedDomains: data.blockedDomains || {},
             statistics: data.statistics || { blockCount: 0, savedTime: 0, blockHistory: {} },
+            strictMode: data.strictMode === true,
             exportDate: new Date().toISOString()
         };
 
@@ -90,11 +99,13 @@ function importSettings(event) {
             if (confirm('Bạn có chắc muốn nhập dữ liệu này? Tất cả cài đặt hiện tại sẽ bị ghi đè.')) {
                 chrome.storage.local.set({
                     blockedDomains: sanitizedDomains,
-                    statistics: data.statistics || { blockCount: 0, savedTime: 0, blockHistory: {} }
+                    statistics: data.statistics || { blockCount: 0, savedTime: 0, blockHistory: {} },
+                    strictMode: data.strictMode === true // file v1.2/v1.3 thiếu key → false
                 }, function () {
                     alert(skippedCount > 0
                         ? `Nhập dữ liệu thành công! (bỏ qua ${skippedCount} mục không phải tên miền hợp lệ)`
                         : 'Nhập dữ liệu thành công!');
+                    document.getElementById('strictModeCheckbox').checked = data.strictMode === true;
                     renderDomainList();
                 });
             }

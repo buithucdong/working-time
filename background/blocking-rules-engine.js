@@ -12,17 +12,23 @@ const DOMAIN_KEY_PATTERN = /^[a-z0-9.-]+$/;
 
 /**
  * Trả về danh sách domain cần chặn tại thời điểm now (đã normalize lowercase, sort, dedupe).
- * Pause (pauseEndTime trong tương lai) ghi đè toàn bộ — không đụng cờ enabled.
+ * Ưu tiên: focus session (chặn TOÀN BỘ danh sách, bỏ qua enabled/khung giờ/pause)
+ * > pause (tắt toàn bộ tạm thời) > luật thường. Cả hai override đều không đụng cờ enabled.
  */
-export function computeActiveDomains(blockedDomains, pauseEndTime, now = new Date()) {
-    if (pauseEndTime && now.getTime() < pauseEndTime) {
+export function computeActiveDomains(blockedDomains, pauseEndTime, focusEndTime, now = new Date()) {
+    const focusActive = focusEndTime && now.getTime() < focusEndTime;
+
+    if (!focusActive && pauseEndTime && now.getTime() < pauseEndTime) {
         return [];
     }
 
     const active = new Set();
     for (const domain in blockedDomains) {
         const domainData = blockedDomains[domain];
-        if (!domainData || !domainData.enabled || !isWithinBlockedWindow(domainData, now)) {
+        if (!domainData) {
+            continue;
+        }
+        if (!focusActive && (!domainData.enabled || !isWithinBlockedWindow(domainData, now))) {
             continue;
         }
         const key = domain.trim().toLowerCase();

@@ -23,24 +23,42 @@ function recompute() {
 
 async function runRecompute() {
     try {
-        const { blockedDomains, pauseEndTime } = await chrome.storage.local.get({
+        const { blockedDomains, pauseEndTime, focusEndTime } = await chrome.storage.local.get({
             blockedDomains: {},
-            pauseEndTime: null
+            pauseEndTime: null,
+            focusEndTime: null
         });
 
         const now = new Date();
 
-        // Dọn pauseEndTime đã hết hạn (ghi storage sẽ kích hoạt thêm 1 recompute — vô hại)
+        // Dọn các override đã hết hạn (ghi storage sẽ kích hoạt thêm 1 recompute — vô hại)
         if (pauseEndTime && now.getTime() >= pauseEndTime) {
             await chrome.storage.local.remove('pauseEndTime');
         }
+        if (focusEndTime && now.getTime() >= focusEndTime) {
+            await chrome.storage.local.remove('focusEndTime');
+        }
 
-        const activeDomains = computeActiveDomains(blockedDomains, pauseEndTime, now);
+        const activeDomains = computeActiveDomains(blockedDomains, pauseEndTime, focusEndTime, now);
         await syncDnrRules(activeDomains);
         await sweepOpenTabs(activeDomains);
+        await updateFocusBadge(focusEndTime, now);
     } catch (e) {
         // Không để một lần recompute lỗi giết cả vòng lặp — tick sau sẽ thử lại
         console.error('Working Time: recompute failed', e);
+    }
+}
+
+/** Badge đếm ngược focus trên icon — độ chính xác 1 phút theo cadence alarm */
+async function updateFocusBadge(focusEndTime, now) {
+    if (focusEndTime && now.getTime() < focusEndTime) {
+        const remainingMinutes = Math.ceil((focusEndTime - now.getTime()) / 60000);
+        await chrome.action.setBadgeBackgroundColor({ color: '#ffd300' });
+        // setBadgeTextColor cần Chrome 110+ — bỏ qua trên bản cũ, badge vẫn hiện
+        await chrome.action.setBadgeTextColor?.({ color: '#162c6e' });
+        await chrome.action.setBadgeText({ text: String(remainingMinutes) });
+    } else {
+        await chrome.action.setBadgeText({ text: '' });
     }
 }
 
@@ -65,7 +83,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && (changes.blockedDomains || changes.pauseEndTime)) {
+    if (areaName === 'local' && (changes.blockedDomains || changes.pauseEndTime || changes.focusEndTime)) {
         recompute();
     }
 });

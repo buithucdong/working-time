@@ -21,6 +21,14 @@
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
                 </button>
+                <button id="focusToggleBtn" class="focus-toggle-btn">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                    <span>Focus</span>
+                </button>
                 <button id="batchToggleBtn" class="batch-toggle-btn">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 11 12 14 22 4"></polyline>
@@ -65,6 +73,35 @@
                         Áp dụng
                     </button>
                     <button id="cancelPauseBtn" class="cancel-btn">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        Hủy
+                    </button>
+                </div>
+            </div>
+
+            <!-- Container cho tùy chọn focus -->
+            <div id="focusDurationContainer" class="pause-card hidden">
+                <div class="pause-content">
+                    <svg class="pause-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                    <label for="focusDuration" class="pause-label">Focus trong:</label>
+                    <input type="number" id="focusDuration" min="5" max="180" value="25" aria-label="Thời gian focus">
+                    <span class="pause-unit">phút — chặn toàn bộ danh sách</span>
+                </div>
+                <div class="pause-actions">
+                    <button id="applyFocusBtn" class="apply-pause-btn">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Bắt đầu
+                    </button>
+                    <button id="cancelFocusBtn" class="cancel-btn">
                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -205,6 +242,16 @@
                 </div>
             </div>
             
+            <!-- Chế độ nghiêm ngặt -->
+            <div class="strict-row">
+                <label class="strict-label">
+                    <input type="checkbox" id="strictModeCheckbox">
+                    <span>Chế độ nghiêm ngặt</span>
+                </label>
+                <span class="strict-hint">Khóa tắt/xóa/sửa khi đang chặn</span>
+                <span id="strictCountdown" class="strict-countdown hidden"></span>
+            </div>
+
             <!-- Import/Export Toggle -->
             <div class="import-export-section">
                 <button id="importExportToggle" class="import-export-toggle">
@@ -248,7 +295,7 @@
 
             <!-- Phiên bản -->
             <div class="version-info">
-                <span>Phiên bản 1.3.0</span> | <a href="https://d-solutions.vn">D-Solutions</a>
+                <span>Phiên bản 1.4.0</span> | <a href="https://d-solutions.vn">D-Solutions</a>
             </div>
         </div>
         <script type="module" src="popup/popup-main.js"></script>
